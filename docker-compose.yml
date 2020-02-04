@@ -1,0 +1,46 @@
+version: "3.7"
+
+# TO DO: Change KAFKA_ADVERTISED_LISTENERS to your public broker IP
+
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:3.3.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 32181
+      ZOOKEEPER_TICK_TIME: 2000
+    extra_hosts:
+      - "moby:127.0.0.1"
+      - "default:127.0.0.1"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 400M
+        reservations:
+          cpus: '0.1'
+          memory: 300M
+      
+  kafka:
+    image: confluentinc/cp-kafka:3.3.0
+    hostname: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - 29092:29092
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:32181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_HEAP_OPTS: -Xmx256M -Xms128M
+    extra_hosts:
+      - "moby:127.0.0.1"
+      - "default:127.0.0.1"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 300M
+        reservations:
+          cpus: '0.1'
+          memory: 100M
